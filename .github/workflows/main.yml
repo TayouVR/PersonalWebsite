@@ -17,7 +17,7 @@ jobs:
           dotnet-version: 8.x
 
       - name: Run Statiq to generate site
-        run: dotnet ./PersonalWebsite/PersonalWebsite.csproj --input ./input --output ./output
+        run: dotnet /home/runner/work/PersonalWebsite/PersonalWebsite/PersonalWebsite/PersonalWebsite.csproj --input ./input --output ./output
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@4.1.5
