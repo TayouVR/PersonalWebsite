@@ -22,8 +22,15 @@ jobs:
       - name: Build Statiq site
         run: dotnet run --project ./PersonalWebsite/PersonalWebsite.csproj
         
-      - name: Deploy to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@4.1.5
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+        
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          branch: gh-pages  # This is the branch your site will be deployed to
-          folder: PersonalWebsite/output  # This is the built output folder from Statiq 
+          # Upload entire repository
+          path: './PersonalWebsite/output'
+          
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
