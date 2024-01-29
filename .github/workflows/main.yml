@@ -44,3 +44,17 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Set GitHub token as an environment variable
         run: dotnet run --project ./PersonalWebsite/PersonalWebsite.csproj
+        # Statiqs own thing doesn't seem to deploy like that, so lets just ignore it
+        
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+        
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # Upload path
+          path: './PersonalWebsite/output'
+          
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

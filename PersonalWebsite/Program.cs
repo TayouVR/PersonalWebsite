@@ -11,7 +11,7 @@ public class Program
         new("DeployGitHubPages", true),
         new("LinksUseHttps", true),
         new("Image", "./images/site-image.avif"),
-        new("GitHubToken", Environment.GetEnvironmentVariable("GITHUB_TOKEN")!),
+        //new("GitHubToken", Environment.GetEnvironmentVariable("GITHUB_TOKEN")!),
     };
     
     public static async Task<int> Main(string[] args) => 
@@ -19,9 +19,9 @@ public class Program
             .Factory
             .CreateWeb(args)
             .AddSettings(settings)
-            .DeployToGitHubPages(
+            /*.DeployToGitHubPages(
                 "TayouVR", 
                 "PersonalWebsite", 
-                Config.FromSetting<string>("GitHubToken"))
+                Config.FromSetting<string>("GitHubToken"))*/
             .RunAsync();
 }
