@@ -20,7 +20,7 @@ jobs:
         run: dotnet restore ./PersonalWebsite/PersonalWebsite.csproj
 
       - name: Build Statiq site
-        run: dotnet run ./PersonalWebsite/PersonalWebsite.csproj
+        run: dotnet run --project ./PersonalWebsite/PersonalWebsite.csproj
         
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@4.1.5
