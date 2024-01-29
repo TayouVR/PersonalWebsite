@@ -1,0 +1,26 @@
+﻿name: Build and Deploy
+on:
+  push:
+    branches:
+      - main  # or replace with the name of your default branch
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.3.4
+
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v1.8.2
+        with:
+          dotnet-version: 8.x
+
+      - name: Run Statiq to generate site
+        run: dotnet ./PersonalWebsite/PersonalWebsite.csproj --input ./input --output ./output
+
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@4.1.5
+        with:
+          branch: gh-pages  # This is the branch your site will be deployed to
+          folder: output  # This is the built output folder from Statiq 
