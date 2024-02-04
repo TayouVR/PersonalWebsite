@@ -1,0 +1,17 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>@((string)Context.GetDocument().GetString("Title"))</title>
+    <link rel="stylesheet" href="/css/site.css" />
+</head>
+<body>
+<nav>
+    <a href="/">Home</a>
+    | <a href="/about">About</a>
+    | <a href="/contact">Contact</a>
+</nav>
+<section>
+    @Context.GetDocument().Content
+</section>
+</body>
+</html>

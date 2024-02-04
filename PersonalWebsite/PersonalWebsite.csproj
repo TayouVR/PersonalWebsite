@@ -12,4 +12,8 @@
       <PackageReference Include="Statiq.Web.GitHub" Version="1.0.0-beta.60" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Compile Include="input\layouts\base.html.cs" />
+    </ItemGroup>
+
 </Project>
