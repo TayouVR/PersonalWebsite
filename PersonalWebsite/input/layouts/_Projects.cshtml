@@ -1,0 +1,127 @@
+@{
+    Layout = "/layouts/_Layout.cshtml";
+
+    var projects = Outputs
+        .FromPipeline("Content")
+        .Flatten()
+        .Where(x => x.Source.Parent.Name == "projects" && x.Source.FileName != "index.md" && x.Source.Extension == ".md")
+        .OrderByDescending(x => x.GetDateTime("Date", x.GetDateTime("Published", DateTime.MinValue)))
+        .ToList();
+
+    var allTags = projects
+        .SelectMany(x => x.GetList<string>("tags") ?? new List<string>())
+        .Distinct()
+        .OrderBy(x => x)
+        .ToList();
+}
+
+<div class="container mx-auto px-4 py-12">
+    <div class="prose lg:prose-xl mx-auto mb-8 text-center">
+        <h1>My Projects</h1>
+        <p>Check out some of the things I've been working on.</p>
+    </div>
+
+    <!-- Filters Section -->
+    <div class="max-w-6xl mx-auto mb-10 flex flex-col md:flex-row gap-4 items-center justify-between">
+        <div class="form-control w-full md:max-w-xs">
+            <input type="text" id="projectSearch" placeholder="Search projects..." class="input input-bordered w-full" />
+        </div>
+        
+        <div class="flex flex-wrap gap-2 justify-center" id="tagFilters">
+            <button class="btn btn-sm btn-outline btn-primary active-tag" data-tag="all">All</button>
+            @foreach (var tag in allTags)
+            {
+                <button class="btn btn-sm btn-outline" data-tag="@tag.ToLower()">@tag</button>
+            }
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto" id="projectsGrid">
+        @foreach (var project in projects)
+        {
+            var title = project.GetString("Title");
+            var image = project.GetString("image") ?? "https://via.placeholder.com/400x225?text=No+Image";
+            var tags = project.GetList<string>("tags") ?? new List<string>();
+            var excerpt = project.GetString("Excerpt") ?? "";
+            if (string.IsNullOrWhiteSpace(excerpt))
+            {
+                using (var reader = project.GetContentProvider().GetTextReader())
+                {
+                    excerpt = reader.ReadToEnd().Split('\n').FirstOrDefault(l => !string.IsNullOrWhiteSpace(l) && !l.StartsWith('#')) ?? "";
+                }
+            }
+            if (excerpt.Length > 120) excerpt = excerpt.Substring(0, 117) + "...";
+
+            <div class="card bg-base-100 shadow-xl border border-base-200 transition-all duration-300 project-card" 
+                 data-tags="@string.Join(",", tags.Select(t => t.ToLower()))"
+                 data-title="@title.ToLower()">
+                <figure><img src="@image" alt="@title" class="h-48 w-full object-cover" /></figure>
+                <div class="card-body">
+                    <h2 class="card-title text-2xl">@title</h2>
+                    <p class="text-base-content/70">@excerpt</p>
+                    <div class="flex flex-wrap gap-1 my-2">
+                        @foreach (var tag in tags)
+                        {
+                            <span class="badge badge-sm badge-outline">@tag</span>
+                        }
+                    </div>
+                    <div class="card-actions justify-end mt-4">
+                        <a href="@Context.GetLink(project)" class="btn btn-primary btn-sm">Learn More</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+    
+    @RenderBody()
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('projectSearch');
+        const tagButtons = document.querySelectorAll('#tagFilters button');
+        const projectCards = document.querySelectorAll('.project-card');
+        
+        let currentTag = 'all';
+        let searchQuery = '';
+
+        function filterProjects() {
+            projectCards.forEach(card => {
+                const title = card.getAttribute('data-title');
+                const tags = card.getAttribute('data-tags').split(',');
+                
+                const matchesSearch = title.includes(searchQuery.toLowerCase());
+                const matchesTag = currentTag === 'all' || tags.includes(currentTag);
+
+                if (matchesSearch && matchesTag) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        searchInput.addEventListener('input', (e) => {
+            searchQuery = e.target.value;
+            filterProjects();
+        });
+
+        tagButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // Update active button state
+                tagButtons.forEach(btn => btn.classList.remove('btn-primary', 'active-tag'));
+                button.classList.add('btn-primary', 'active-tag');
+                
+                currentTag = button.getAttribute('data-tag');
+                filterProjects();
+            });
+        });
+    });
+</script>
+
+<style>
+    .active-tag {
+        background-color: hsl(var(--p)) !important;
+        color: hsl(var(--pc)) !important;
+    }
+</style>
