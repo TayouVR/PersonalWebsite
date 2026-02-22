@@ -25,4 +25,4 @@ I do try to get some workouts in every once in a while in Beat Saber and Audica.
 
 ## Contact
 
-If you want to get in touch, you can email me at contact-web@tayou.org. You can also follow me on various social media platforms, but I'm not really active on them. Some links may be in the header.
+If you want to get in touch, you can email me at [contact-web@tayou.org](mailto:contact-web@tayou.org). You can also follow me on various social media platforms, but I'm not really active on them. Some links may be in the header.
