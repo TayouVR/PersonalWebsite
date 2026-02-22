@@ -1,6 +1,24 @@
+@using System.Net.Http
 @{
     Layout = "/layouts/_Layout.cshtml";
     var tags = Document.GetList<string>("tags") ?? new List<string>();
+    var readmeUrl = Document.GetString("readmeUrl");
+    var httpClient = new HttpClient();
+    string? readmeHtml = null;
+
+    if (!string.IsNullOrWhiteSpace(readmeUrl))
+    {
+        try
+        {
+            var rawUrl = PersonalWebsite.MarkdownHelper.GetRawGitHubUrl(readmeUrl);
+            var content = httpClient.GetStringAsync(rawUrl).Result;
+            readmeHtml = PersonalWebsite.MarkdownHelper.ConvertMarkdown(content);
+        }
+        catch (Exception ex)
+        {
+            readmeHtml = $"<div class=\"alert alert-error shadow-lg\"><div><span>Error fetching README: {ex.Message}</span></div></div>";
+        }
+    }
 }
 
 <div class="container mx-auto px-4 py-12">
@@ -23,7 +41,15 @@
         </div>
 
         <div class="prose lg:prose-xl max-w-none">
-            @RenderBody()
+            @if (readmeHtml != null)
+            {
+                @Html.Raw(readmeHtml)
+                IgnoreBody();
+            }
+            else
+            {
+                @RenderBody()
+            }
         </div>
     </div>
 </div>

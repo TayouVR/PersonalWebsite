@@ -1,5 +1,7 @@
+@using System.Net.Http
 @{
     Layout = "/layouts/_Layout.cshtml";
+    var httpClient = new HttpClient();
 
     var projects = Outputs
         .FromPipeline("Content")
@@ -40,9 +42,24 @@
         @foreach (var project in projects)
         {
             var title = project.GetString("Title");
-            var image = project.GetString("image") ?? "https://via.placeholder.com/400x225?text=No+Image";
+            var image = project.GetString("image") ?? "";
             var tags = project.GetList<string>("tags") ?? new List<string>();
             var excerpt = project.GetString("Excerpt") ?? "";
+            var readmeUrl = project.GetString("readmeUrl");
+            if (!string.IsNullOrWhiteSpace(readmeUrl))
+            {
+                try
+                {
+                    var rawUrl = PersonalWebsite.MarkdownHelper.GetRawGitHubUrl(readmeUrl);
+                    var response = httpClient.GetStringAsync(rawUrl).Result;
+                    excerpt = response.Split('\n').FirstOrDefault(l => !string.IsNullOrWhiteSpace(l) && !l.StartsWith('#')) ?? "";
+                }
+                catch (Exception)
+                {
+                    // Fallback to existing logic if fetch fails
+                }
+            }
+
             if (string.IsNullOrWhiteSpace(excerpt))
             {
                 using (var reader = project.GetContentProvider().GetTextReader())
@@ -50,6 +67,8 @@
                     excerpt = reader.ReadToEnd().Split('\n').FirstOrDefault(l => !string.IsNullOrWhiteSpace(l) && !l.StartsWith('#')) ?? "";
                 }
             }
+            
+            excerpt = PersonalWebsite.MarkdownHelper.StripHtml(excerpt);
             if (excerpt.Length > 120) excerpt = excerpt.Substring(0, 117) + "...";
 
             <div class="card bg-base-100 shadow-xl border border-base-200 transition-all duration-300 project-card" 
